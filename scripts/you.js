@@ -1,4 +1,4 @@
-/* [Oct 2021] Audio playback fixes */
+/* Audio playback and looping */
 
 var audioStarted = false;
 
@@ -7,80 +7,53 @@ var audio = document.getElementById('youare-audio');
 var micon = document.getElementById('youare-micon');
 
 ```
-if (!audio) {
-    console.error('Audio element #youare-audio not found.');
-    return;
-}
+if (!audio) return;
 
-if (!audioStarted) {
-    audioStarted = true;
-    audio.loop = true;
-
+if (audio.paused) {
     audio.play().then(function () {
-        if (micon) {
-            micon.src = "images/speaker.png";
-        }
+        audioStarted = true;
+        if (micon) micon.src = "images/speaker.png";
     }).catch(function (error) {
-        audioStarted = false;
-        console.error('Audio playback failed:', error);
-    });
-} else if (audio.paused) {
-    audio.play().then(function () {
-        if (micon) {
-            micon.src = "images/speaker.png";
-        }
-    }).catch(function (error) {
-        console.error('Audio playback failed:', error);
+        console.warn("Audio playback blocked:", error);
     });
 } else {
     audio.pause();
     audio.currentTime = 0;
     audioStarted = false;
 
-    if (micon) {
-        micon.src = "images/speakerm.png";
-    }
+    if (micon) micon.src = "images/speakerm.png";
 }
 ```
 
 }
 
-document.addEventListener('click', musicPlay, { once: true });
-
-document.addEventListener('DOMContentLoaded', function () {
+function startAudio() {
+var audio = document.getElementById('youare-audio');
 var micon = document.getElementById('youare-micon');
 
 ```
-if (micon) {
-    micon.addEventListener('click', function (event) {
-        event.stopPropagation();
-
-        var audio = document.getElementById('youare-audio');
-
-        if (!audio) return;
-
-        if (audio.paused) {
-            audioStarted = true;
-            audio.loop = true;
-
-            audio.play().then(function () {
-                micon.src = "images/speaker.png";
-            }).catch(function (error) {
-                console.error('Audio playback failed:', error);
-            });
-        } else {
-            audio.pause();
-            audio.currentTime = 0;
-            audioStarted = false;
-            micon.src = "images/speakerm.png";
-        }
-    });
+if (!audio) {
+    console.error("Audio element #youare-audio not found.");
+    return;
 }
+
+audio.loop = true;
+audio.volume = 1;
+
+audio.play().then(function () {
+    audioStarted = true;
+    if (micon) micon.src = "images/speaker.png";
+}).catch(function (error) {
+    console.warn("Autoplay blocked by browser:", error);
+});
 ```
 
-});
+}
 
-/* [Oct 2021] End audio fixes */
+document.addEventListener('DOMContentLoaded', startAudio);
+
+window.addEventListener('load', startAudio);
+
 
 function bookmark() {
 if ((navigator.appName == "Microsoft Internet Explorer") &&
