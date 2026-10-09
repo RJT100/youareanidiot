@@ -1,46 +1,98 @@
-/* [Oct 2021] Added to comply with strict browser policies. */
-document.addEventListener('click', musicPlay);
+/* [Oct 2021] Audio playback fixes */
+
+var audioStarted = false;
 
 function musicPlay() {
-    var audio = document.getElementById('youare-audio');
-	var micon = document.getElementById('youare-micon');
-	
-	micon.addEventListener('click', musicPlay);
-	
-	if (audio.duration > 0 && audio.paused) {
-		audio.play();
-		micon.src = "images/speaker.png";
-	}
-	else {
-		audio.pause();
-		audio.currentTime = 0;
-		
-		micon.src = "images/speakerm.png";
-	}
-	
-	document.removeEventListener('click', musicPlay);
+var audio = document.getElementById('youare-audio');
+var micon = document.getElementById('youare-micon');
+
+```
+if (!audio) {
+    console.error('Audio element #youare-audio not found.');
+    return;
 }
 
-var faudio = new Audio('youare.mp3')
+if (!audioStarted) {
+    audioStarted = true;
+    audio.loop = true;
 
-faudio.addEventListener('timeupdate', function() {
-	console.log('TimeUpdate invoked.');
+    audio.play().then(function () {
+        if (micon) {
+            micon.src = "images/speaker.png";
+        }
+    }).catch(function (error) {
+        audioStarted = false;
+        console.error('Audio playback failed:', error);
+    });
+} else if (audio.paused) {
+    audio.play().then(function () {
+        if (micon) {
+            micon.src = "images/speaker.png";
+        }
+    }).catch(function (error) {
+        console.error('Audio playback failed:', error);
+    });
+} else {
+    audio.pause();
+    audio.currentTime = 0;
+    audioStarted = false;
 
-    if (this.currentTime > this.duration - .45) {
-        this.currentTime = 0;
-        this.play();
+    if (micon) {
+        micon.src = "images/speakerm.png";
     }
 }
-);
-/* [Oct 2021] End part. */
+```
+
+}
+
+document.addEventListener('click', musicPlay, { once: true });
+
+document.addEventListener('DOMContentLoaded', function () {
+var micon = document.getElementById('youare-micon');
+
+```
+if (micon) {
+    micon.addEventListener('click', function (event) {
+        event.stopPropagation();
+
+        var audio = document.getElementById('youare-audio');
+
+        if (!audio) return;
+
+        if (audio.paused) {
+            audioStarted = true;
+            audio.loop = true;
+
+            audio.play().then(function () {
+                micon.src = "images/speaker.png";
+            }).catch(function (error) {
+                console.error('Audio playback failed:', error);
+            });
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+            audioStarted = false;
+            micon.src = "images/speakerm.png";
+        }
+    });
+}
+```
+
+});
+
+/* [Oct 2021] End audio fixes */
 
 function bookmark() {
-	if ((navigator.appName == "Microsoft Internet Explorer") && (parseInt(navigator.appVersion) >= 4)) {
-		var url = "lol.html";
-		var title = "Idiot!";
-		
-		window.external.AddFavorite(url, title);
-	}
+if ((navigator.appName == "Microsoft Internet Explorer") &&
+(parseInt(navigator.appVersion) >= 4)) {
+var url = "lol.html";
+var title = "Idiot!";
+
+```
+    window.external.AddFavorite(url, title);
+}
+```
+
 }
 
 var xOff = 5;
@@ -50,128 +102,116 @@ var yPos = -100;
 var flagRun = 1;
 
 function changeTitle(title) {
-	document.title = title;
+document.title = title;
 }
 
 function openWindow(url) {
-	aWindow = window.open(url, "_blank", 'menubar=no, status=no, toolbar=no, resizable=no, width=357, height=330, titlebar=no, alwaysRaised=yes');
+window.open(
+url,
+"_blank",
+'menubar=no, status=no, toolbar=no, resizable=no, width=357, height=330, titlebar=no, alwaysRaised=yes'
+);
 }
 
-function proCreate() {	
-	for (var i = 0; i < 5; i++) {
-		openWindow('lol.html');
-	}
+function proCreate() {
+for (var i = 0; i < 5; i++) {
+openWindow('lol.html');
+}
 }
 
 function newXlt() {
-	xOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-	window.focus();
+xOff = Math.ceil(-6 * Math.random()) * 5 - 10;
+window.focus();
 }
 
 function newXrt() {
-	xOff = Math.ceil(7 * Math.random())  * 5 - 10;
-	window.focus();
+xOff = Math.ceil(7 * Math.random()) * 5 - 10;
+window.focus();
 }
 
 function newYup() {
-	yOff = Math.ceil(-6 * Math.random()) * 5 - 10;
-	window.focus();
+yOff = Math.ceil(-6 * Math.random()) * 5 - 10;
+window.focus();
 }
 
 function newYdn() {
-	yOff = Math.ceil( 7 * Math.random()) * 5 - 10;
-	window.focus();
+yOff = Math.ceil(7 * Math.random()) * 5 - 10;
+window.focus();
 }
 
-function fOff(){
-	flagRun = 0;
+function fOff() {
+flagRun = 0;
 }
 
 function playBall() {
-    xPos += xOff;
-    yPos += yOff;
-    
-	if (xPos > screen.width - 357) newXlt();    
-	if (xPos < 0) newXrt();
-    
-	if (yPos > screen.height - 330) newYup(); 		
-	if (yPos < 0) newYdn();
-    
-	if (flagRun == 1) {
-        window.moveTo(xPos, yPos);
-        setTimeout('playBall()', 1);
-    }
+xPos += xOff;
+yPos += yOff;
+
+```
+if (xPos > screen.width - 357) newXlt();
+if (xPos < 0) newXrt();
+
+if (yPos > screen.height - 330) newYup();
+if (yPos < 0) newYdn();
+
+if (flagRun == 1) {
+    window.moveTo(xPos, yPos);
+    setTimeout(playBall, 1);
+}
+```
+
 }
 
-/* [Oct 2021] Better code. */
 window.onload = function () {
-	flagRun = 1;
-	
-	playBall();
-	bookmark(); // Internet Explorer only (what a piece of sugar)
-	
-	return true;
-}
+flagRun = 1;
+
+```
+playBall();
+bookmark();
+
+return true;
+```
+
+};
 
 window.onmouseout = function () {
-	proCreate();
-
-	return null;
+proCreate();
+return null;
 };
 
-window.oncontextmenu = function() {
-	
-	return false;
-}
-
-window.onkeydown = function() {	
-	var keyCode = event.keyCode;
-	
-	if (keyCode == 17 || keyCode == 18 || keyCode == 46 || keyCode == 115) {	
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");	
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    	alert("UwU");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("You dumb?????!");
-    alert("!"); 
-    alert("!"); 
-    alert("!"); 
-    alert("!"); 
-		proCreate();
-	}
-	
-	return null;
-}
-
-window.onbeforeunload = function() {
-    return "UwU";
+window.oncontextmenu = function () {
+return false;
 };
-/* [Oct 2021] End of amendments. */l
+
+window.onkeydown = function (event) {
+var keyCode = event.keyCode;
+
+```
+if (keyCode == 17 || keyCode == 18 ||
+    keyCode == 46 || keyCode == 115) {
+
+    for (var i = 0; i < 22; i++) {
+        alert("UwU");
+    }
+
+    for (var i = 0; i < 10; i++) {
+        alert("You dumb?????!");
+    }
+
+    alert("!");
+    alert("!");
+    alert("!");
+
+    proCreate();
+}
+
+return null;
+```
+
+};
+
+window.onbeforeunload = function () {
+return "UwU";
+};
+
+/* [Oct 2021] End of amendments. */
